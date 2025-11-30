@@ -1,14 +1,21 @@
 import { colors } from "@/components/ui/themes/colors";
+import { LinearGradient } from "expo-linear-gradient";
 import { StatusBar } from "expo-status-bar";
 import React from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function index() {
   return (
-    <View style={styles.container}>
-      <StatusBar backgroundColor={colors.background} style="light" />
-      <Text style={styles.text}>Onboarding</Text>
-    </View>
+    <LinearGradient
+      colors={["#ff0000", "#fff"]}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+    >
+      <View style={styles.container}>
+        <StatusBar backgroundColor={colors.background} style="light" />
+        <Text style={styles.text}>Onboarding</Text>
+      </View>
+    </LinearGradient>
   );
 }
 
