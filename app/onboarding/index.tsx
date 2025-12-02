@@ -56,7 +56,7 @@ export default function Onboarding() {
               router.replace("/auth/connexion");
             }}
           >
-            <Text style={styles.connexion}>Connexion</Text>
+            <Text style={styles.connexion}>Inscription</Text>
           </Pressable>
         </View>
       </View>

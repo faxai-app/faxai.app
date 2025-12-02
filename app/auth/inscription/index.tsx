@@ -1,6 +1,6 @@
 import { AppButton } from "@/components";
 import { colors } from "@/components/ui/themes/colors";
-import * as Google from "expo-auth-session/providers/google";
+// import * as Google from "expo-auth-session/providers/google";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Eye } from "lucide-react-native";
@@ -21,9 +21,9 @@ export default function Inscription() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  const [request, response, promptAsync] = Google.useAuthRequest({
-    androidClientId: "TON_ANDROID_CLIENT_ID.apps.googleusercontent.com",
-  });
+  // const [request, response, promptAsync] = Google.useAuthRequest({
+  //   androidClientId: "TON_ANDROID_CLIENT_ID.apps.googleusercontent.com",
+  // });
 
   return (
     <SafeAreaView style={styles.container}>
@@ -41,8 +41,8 @@ export default function Inscription() {
           <Text style={styles.labelText}>Inscription</Text>
           <TouchableOpacity
             style={styles.googleSection}
-            disabled={!request}
-            onPress={() => promptAsync()}
+            // disabled={!request}
+            // onPress={() => promptAsync()}
           >
             <Image
               style={styles.googleLogo}
