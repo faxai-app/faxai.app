@@ -86,11 +86,14 @@ export default function Connexion() {
             secureTextEntry
             placeholderTextColor="#fff"
           />
+          <TouchableOpacity onPress={()=>{router.replace("/Personalisation")}} style={styles.oublier}>
+           <Text style={styles.oublierText}>Oublié</Text>
+          </TouchableOpacity>
         </View>
 
         <AppButton
-          label="INSCRIPTION"
-          onPress={() => router.replace("/auth/inscription")}
+          label="CONNECTION"
+          onPress={() => router.replace("/auth/Connexion")}
         />
       </View>
 
@@ -179,7 +182,7 @@ const styles = StyleSheet.create({
     color: "#fff",
     borderColor: "#fff",
     fontSize: 18,
-    width: "80%",
+    flex: 1,
   },
   emailIcon: {
     backgroundColor: colors.primary,
@@ -205,4 +208,14 @@ const styles = StyleSheet.create({
     fontWeight: 500,
     color: colors.primary,
   },
+  oublier: {
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 25,
+    backgroundColor: colors.primary
+  },
+  oublierText:{
+    color: "#fff",
+    fontSize: 18
+  }
 });
