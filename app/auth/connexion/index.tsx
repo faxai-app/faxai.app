@@ -86,14 +86,14 @@ export default function Connexion() {
             secureTextEntry
             placeholderTextColor="#fff"
           />
-          <TouchableOpacity onPress={()=>{router.replace("/Personalisation")}} style={styles.oublier}>
+          <TouchableOpacity onPress={()=>{router.replace("/auth/mdp")}} style={styles.oublier}>
            <Text style={styles.oublierText}>Oublié</Text>
           </TouchableOpacity>
         </View>
 
         <AppButton
           label="CONNECTION"
-          onPress={() => router.replace("/auth/Connexion")}
+          onPress={() => router.replace("/auth/connexion")}
         />
       </View>
 
