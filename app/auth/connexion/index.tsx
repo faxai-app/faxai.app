@@ -1,6 +1,6 @@
 import { AppButton } from "@/components";
 import { colors } from "@/components/ui/themes/colors";
-// import * as Google from "expo-auth-session/providers/google";
+import { login } from "@/services/auth.service";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Eye } from "lucide-react-native";
@@ -21,9 +21,14 @@ export default function Connexion() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  // const [request, response, promptAsync] = Google.useAuthRequest({
-  //   androidClientId: "TON_ANDROID_CLIENT_ID.apps.googleusercontent.com",
-  // });
+  const handleSubmit = async () => {
+    try {
+      login({ email, password });
+      console.log("user login");
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,11 +44,7 @@ export default function Connexion() {
       <View style={styles.section}>
         <View style={styles.headSection}>
           <Text style={styles.labelText}>Connexion</Text>
-          <TouchableOpacity
-            style={styles.googleSection}
-            // disabled={!request}
-            // onPress={() => promptAsync()}
-          >
+          <TouchableOpacity style={styles.googleSection}>
             <Image
               style={styles.googleLogo}
               source={require("@/assets/images/google.png")}
@@ -86,15 +87,17 @@ export default function Connexion() {
             secureTextEntry
             placeholderTextColor="#fff"
           />
-          <TouchableOpacity onPress={()=>{router.replace("/auth/mdp")}} style={styles.oublier}>
-           <Text style={styles.oublierText}>Oublié</Text>
+          <TouchableOpacity
+            onPress={() => {
+              router.replace("/auth/mdp");
+            }}
+            style={styles.oublier}
+          >
+            <Text style={styles.oublierText}>Oublié</Text>
           </TouchableOpacity>
         </View>
 
-        <AppButton
-          label="CONNECTION"
-          onPress={() => router.replace("/auth/connexion")}
-        />
+        <AppButton label="CONNECTION" onPress={handleSubmit} />
       </View>
 
       <View style={styles.connexionView}>

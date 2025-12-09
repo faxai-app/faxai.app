@@ -1,6 +1,6 @@
 import { AppButton } from "@/components";
 import { colors } from "@/components/ui/themes/colors";
-// import * as Google from "expo-auth-session/providers/google";
+import { register } from "@/services/auth.service";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Eye } from "lucide-react-native";
@@ -21,9 +21,14 @@ export default function Inscription() {
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
 
-  // const [request, response, promptAsync] = Google.useAuthRequest({
-  //   androidClientId: "TON_ANDROID_CLIENT_ID.apps.googleusercontent.com",
-  // });
+  const handleSubmit = async () => {
+    try {
+      const wel = await register({ email, password });
+      console.log(wel.data);
+    } catch (e) {
+      console.log(e);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -39,11 +44,7 @@ export default function Inscription() {
       <View style={styles.section}>
         <View style={styles.headSection}>
           <Text style={styles.labelText}>Inscription</Text>
-          <TouchableOpacity
-            style={styles.googleSection}
-            // disabled={!request}
-            // onPress={() => promptAsync()}
-          >
+          <TouchableOpacity style={styles.googleSection}>
             <Image
               style={styles.googleLogo}
               source={require("@/assets/images/google.png")}
@@ -88,17 +89,15 @@ export default function Inscription() {
           />
         </View>
 
-        <AppButton
-          label="INSCRIPTION"
-          onPress={() => router.replace("/auth/inscription")}
-        />
+        <AppButton label="INSCRIPTION" onPress={handleSubmit} />
       </View>
 
       <View style={styles.connexionView}>
         <Text style={styles.descriptionText}>Vous avez déjà un compte ?</Text>
         <Pressable
           onPress={() => {
-            router.replace("/auth/connexion");
+            router.replace("../connectedScreen");
+            // router.replace("/auth/connexion");
           }}
         >
           <Text style={styles.connexion}>Connexion</Text>

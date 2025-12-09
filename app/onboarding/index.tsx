@@ -40,9 +40,9 @@ export default function Onboarding() {
           Préparer vos Examen avec Zéro stress
         </Text>
 
-        {/* CORRIGÉ ICI : plus de &apos; → juste une apostrophe normale */}
         <Text style={styles.descriptionText}>
-          Rejoins une communauté où tout le monde partage des anciens sujets d'examen pour faire valider tout le monde
+          Rejoins une communauté où tout le monde partage des anciens sujets
+          d&apos;examen pour faire valider tout le monde
         </Text>
 
         <AppButton
@@ -58,7 +58,6 @@ export default function Onboarding() {
         </View>
       </View>
 
-      {/* On garde le footer vide pour forcer le dégradé jusqu’en bas */}
       <View style={styles.gradientFooter} />
     </LinearGradient>
   );
@@ -84,7 +83,6 @@ const styles = StyleSheet.create({
     bottom: 0,
     height: "50%",
     width: "100%",
-    // backgroundColor supprimé → plus de trait noir
   },
   radialGradient: {
     position: "absolute",
@@ -103,7 +101,6 @@ const styles = StyleSheet.create({
     fontWeight: "300",
     fontSize: 12,
     color: "#c8c3c3ff",
-    textAlign: "center",
   },
   connexionView: {
     display: "flex",
@@ -119,7 +116,6 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "700",
     color: "#fff",
-    textAlign: "center",
   },
   logoView: {
     display: "flex",
