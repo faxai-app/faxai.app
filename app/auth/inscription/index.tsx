@@ -89,7 +89,10 @@ export default function Inscription() {
           />
         </View>
 
-        <AppButton label="INSCRIPTION" onPress={handleSubmit} />
+        <AppButton
+          label="INSCRIPTION"
+          onPress={() => router.replace("../connectedScreen")}
+        />
       </View>
 
       <View style={styles.connexionView}>
