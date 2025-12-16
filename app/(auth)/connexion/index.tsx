@@ -89,7 +89,7 @@ export default function Connexion() {
           />
           <TouchableOpacity
             onPress={() => {
-              router.replace("/auth/mdp");
+              router.replace("/mdp");
             }}
             style={styles.oublier}
           >
@@ -104,7 +104,7 @@ export default function Connexion() {
         <Text style={styles.descriptionText}>Vous avez déjà un compte ?</Text>
         <Pressable
           onPress={() => {
-            router.replace("/auth/connexion");
+            router.replace("/connected");
           }}
         >
           <Text style={styles.connexion}>Inscription</Text>
@@ -215,10 +215,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     borderRadius: 25,
-    backgroundColor: colors.primary
+    backgroundColor: colors.primary,
   },
-  oublierText:{
+  oublierText: {
     color: "#fff",
-    fontSize: 18
-  }
+    fontSize: 18,
+  },
 });
