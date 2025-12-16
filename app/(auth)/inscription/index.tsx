@@ -1,6 +1,5 @@
 import { AppButton } from "@/components";
 import { colors } from "@/components/ui/themes/colors";
-import { register } from "@/services/auth.service";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Eye } from "lucide-react-native";
@@ -23,8 +22,8 @@ export default function Inscription() {
 
   const handleSubmit = async () => {
     try {
-      const wel = await register({ email, password });
-      console.log(wel.data);
+      // const wel = await register({ email, password });
+      console.log(email);
     } catch (e) {
       console.log(e);
     }
@@ -89,15 +88,16 @@ export default function Inscription() {
           />
         </View>
 
-        <AppButton label="INSCRIPTION" onPress={handleSubmit} />
+        <AppButton label="CONNECTION" onPress={handleSubmit} />
       </View>
 
       <View style={styles.connexionView}>
         <Text style={styles.descriptionText}>Vous avez déjà un compte ?</Text>
         <Pressable
           onPress={() => {
-            router.replace("../connectedScreen");
-            // router.replace("/auth/connexion");
+            console.log("CLICK");
+            router.replace("/connected");
+            // router.replace("/connexion");
           }}
         >
           <Text style={styles.connexion}>Connexion</Text>

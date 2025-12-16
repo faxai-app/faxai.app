@@ -47,12 +47,12 @@ export default function Onboarding() {
 
         <AppButton
           label="Commencer"
-          onPress={() => router.replace("/auth/inscription")}
+          onPress={() => router.replace("/connexion")}
         />
 
         <View style={styles.connexionView}>
           <Text style={styles.descriptionText}>Vous avez déjà un compte ?</Text>
-          <Pressable onPress={() => router.replace("/auth/connexion")}>
+          <Pressable onPress={() => router.replace("/connexion")}>
             <Text style={styles.connexion}>Connexion</Text>
           </Pressable>
         </View>
