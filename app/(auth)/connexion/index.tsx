@@ -24,7 +24,6 @@ export default function Connexion() {
   const handleSubmit = async () => {
     try {
       login({ email, password });
-      console.log("user login");
     } catch (e) {
       console.log(e);
     }
@@ -39,7 +38,7 @@ export default function Connexion() {
         </TouchableOpacity>
       </View>
       <View>
-        <Text style={styles.pageTitle}>CONNCTEZ VOUS POUR CONTINUER</Text>
+        <Text style={styles.pageTitle}>CONNECTEZ VOUS POUR CONTINUER</Text>
       </View>
       <View style={styles.section}>
         <View style={styles.headSection}>
