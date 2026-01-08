@@ -11,9 +11,9 @@ const SearchBar = () => {
       style={styles.container}
     >
       <View style={styles.inputContainer}>
-        <Search color="#000" strokeWidth={2} />
+        <Search color={colors.primary} strokeWidth={2} />
         <TextInput style={styles.textInput} placeholder="Rechercher..." />
-        <SlidersHorizontal color="#000" strokeWidth={2} />
+        <SlidersHorizontal color={colors.primary} strokeWidth={2} />
       </View>
     </LinearGradient>
   );
@@ -38,8 +38,6 @@ const styles = StyleSheet.create({
     borderRadius: 25,
   },
   textInput: {
-    // flex: 1,
-    // borderWidth: 2,
     width: "80%",
   },
 });
