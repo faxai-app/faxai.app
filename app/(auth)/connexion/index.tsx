@@ -5,8 +5,9 @@ import { useAuthStore } from "@/store/store";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Eye } from "lucide-react-native";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
+  BackHandler,
   Image,
   Pressable,
   StyleSheet,
@@ -43,6 +44,20 @@ export default function Connexion() {
       console.error(e);
     }
   };
+
+  useEffect(() => {
+    const backAction = () => {
+      router.replace("/onboarding");
+
+      return true;
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      "hardwareBackPress",
+      backAction
+    );
+    return () => backHandler.remove();
+  }, [router]);
 
   return (
     <SafeAreaView style={styles.container}>
