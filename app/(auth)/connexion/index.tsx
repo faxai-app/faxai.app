@@ -5,7 +5,7 @@ import { useAuthStore } from "@/store/store";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Eye } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Image,
   Pressable,
@@ -19,6 +19,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Connexion() {
   const router = useRouter();
+  const passwordRef = useRef<TextInput>(null);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
@@ -87,7 +88,11 @@ export default function Connexion() {
             onChangeText={setEmail}
             placeholder="email"
             keyboardType="email-address"
+            returnKeyType="next"
+            autoCapitalize="none"
             placeholderTextColor="#fff"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+            blurOnSubmit={true}
           />
         </View>
 
@@ -102,6 +107,9 @@ export default function Connexion() {
             placeholder="mot de passe"
             keyboardType="default"
             secureTextEntry
+            autoCapitalize="none"
+            ref={passwordRef}
+            onSubmitEditing={handleSubmit}
             placeholderTextColor="#fff"
           />
           <TouchableOpacity

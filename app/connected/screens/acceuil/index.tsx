@@ -1,19 +1,21 @@
 import { SearchBar } from "@/components/SearchBar";
+import { useAuthStore } from "@/store/store";
 import { Bell, Menu } from "lucide-react-native";
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Acceuil() {
+  const { logout } = useAuthStore();
   return (
     <View style={styles.container}>
       <SafeAreaView style={styles.header}>
         <View style={styles.iconView}>
           <Menu color="#fff" />
         </View>
-        <View style={styles.iconView}>
+        <TouchableOpacity onPress={logout} style={styles.iconView}>
           <Bell color="#fff" />
-        </View>
+        </TouchableOpacity>
       </SafeAreaView>
       <Text style={styles.title}>
         Faites une recherche et trouver des anciens sujets avec correction

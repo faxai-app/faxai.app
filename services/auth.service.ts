@@ -1,4 +1,5 @@
 import { api } from "@/api/axios";
+import { useUserStore } from "@/store/store";
 
 export const loginUser = async (credentials: {
   email: string;
@@ -33,10 +34,16 @@ export const completeProfile = async (userData: {
   ecole: string;
   filiere: string;
   niveau: number;
-  specialisation?: string;
 }) => {
   try {
     const response = await api.put("/auth/complete-profile", userData);
+
+    // SI SUCCÈS : On stocke les infos dans Zustand
+    // On suppose que ton serveur renvoie l'objet user mis à jour ou au moins confirme le succès
+    if (response.status === 200) {
+      useUserStore.getState().setUser(userData);
+    }
+
     return { data: response.data, error: null };
   } catch (error: any) {
     const message =

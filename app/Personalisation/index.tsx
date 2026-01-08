@@ -7,6 +7,8 @@ import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, BookOpen, School, User } from "lucide-react-native";
 import React, { useMemo, useRef, useState } from "react";
 import {
+  KeyboardAvoidingView,
+  Platform,
   ScrollView,
   StyleSheet,
   Text,
@@ -24,8 +26,8 @@ export default function Personalisation() {
   const [ecole, setEcole] = useState("");
   const [niveau, setNiveau] = useState<number | null>(null);
   const [filiere, setFiliere] = useState("");
-  const [specialisation, setSpecialisation] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const ecoleRef = useRef<TextInput>(null);
 
   const [showEcoleList, setShowEcoleList] = useState(false);
@@ -43,8 +45,10 @@ export default function Personalisation() {
   );
 
   const handleComplete = async () => {
+    setError(null);
+
     if (!nom || !ecole || !niveau || !filiere) {
-      alert("Veuillez remplir les champs obligatoires");
+      setError("Veuillez remplir tous les champs");
       return;
     }
 
@@ -60,7 +64,7 @@ export default function Personalisation() {
       });
 
       if (result.error) {
-        alert(result.error);
+        setError(result.error);
       } else {
         console.log("Profil mis à jour !");
         router.replace("/connected");
@@ -74,142 +78,155 @@ export default function Personalisation() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar style="light" translucent />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={styles.container}>
+        <StatusBar style="light" translucent />
 
-      <View style={styles.backBoutton}>
-        <TouchableOpacity onPress={() => router.replace("/connexion")}>
-          <ArrowLeft color="#fff" size={25} />
-        </TouchableOpacity>
-      </View>
+        <View style={styles.backBoutton}>
+          <TouchableOpacity onPress={() => router.replace("/connexion")}>
+            <ArrowLeft color="#fff" size={25} />
+          </TouchableOpacity>
+        </View>
 
-      <Text style={styles.pageTitle}>PERSONNALISATION</Text>
-      <Text style={styles.subtitle}>Complétez votre profil académique</Text>
+        <Text style={styles.pageTitle}>PERSONNALISATION</Text>
+        <Text
+          style={[styles.subtitle, { color: error ? "#ff0000" : "#ffffffaa" }]}
+        >
+          {!error ? "Complétez votre profil académique" : error}
+        </Text>
 
-      <ScrollView
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-        style={{ flex: 1 }}
-      >
-        <View style={styles.section}>
-          {/* NOM */}
-          <View style={styles.inputWrapper}>
-            <View style={styles.iconCircle}>
-              <User color="#fff" size={22} />
-            </View>
-            <TextInput
-              style={styles.textInput}
-              placeholder="Nom complet"
-              placeholderTextColor="#ffffff88"
-              value={nom}
-              onChangeText={setNom}
-              returnKeyType="next"
-              onSubmitEditing={() => ecoleRef.current?.focus()}
-            />
-          </View>
-
-          <View style={{ zIndex: 2000 }}>
+        <ScrollView
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+          style={{ flex: 1 }}
+        >
+          <View style={styles.section}>
+            {/* NOM */}
             <View style={styles.inputWrapper}>
               <View style={styles.iconCircle}>
-                <School color="#fff" size={22} />
+                <User color="#fff" size={22} />
               </View>
               <TextInput
                 style={styles.textInput}
-                placeholder="École / Université"
+                placeholder="Nom complet"
                 placeholderTextColor="#ffffff88"
-                ref={ecoleRef}
-                value={ecole}
-                onChangeText={(t) => {
-                  setEcole(t);
-                  setShowEcoleList(true);
-                }}
-                onFocus={() => setShowEcoleList(true)}
+                value={nom}
+                onChangeText={setNom}
+                returnKeyType="next"
+                onSubmitEditing={() => ecoleRef.current?.focus()}
               />
             </View>
-            {showEcoleList && ecole.length > 0 && (
-              <View style={styles.suggestionBox}>
-                {filteredEcoles.map((item) => (
-                  <TouchableOpacity
-                    key={item}
-                    style={styles.suggestionItem}
-                    onPress={() => {
-                      setEcole(item);
-                      setShowEcoleList(false);
-                    }}
-                  >
-                    <Text style={styles.suggestionText}>{item}</Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            )}
-          </View>
 
-          <Text style={styles.labelSection}>Niveau d&apos;étude</Text>
-          <View style={styles.levelContainer}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <TouchableOpacity
-                key={n}
-                style={[
-                  styles.levelCircle,
-                  niveau === n && styles.levelCircleActive,
-                ]}
-                onPress={() => {
-                  setNiveau(n);
-                  setFiliere("");
-                }}
-              >
-                <Text style={styles.levelText}>{n}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {niveau && (
-            <View style={{ zIndex: 1000, marginTop: 10 }}>
+            <View style={{ zIndex: 2000 }}>
               <View style={styles.inputWrapper}>
                 <View style={styles.iconCircle}>
-                  <BookOpen color="#fff" size={22} />
+                  <School color="#fff" size={22} />
                 </View>
                 <TextInput
                   style={styles.textInput}
-                  placeholder="Rechercher ma filière..."
+                  placeholder="École / Université"
                   placeholderTextColor="#ffffff88"
-                  value={filiere}
+                  ref={ecoleRef}
+                  value={ecole}
                   onChangeText={(t) => {
-                    setFiliere(t);
-                    setShowFiliereList(true);
+                    setEcole(t);
+                    setShowEcoleList(true);
                   }}
-                  onFocus={() => setShowFiliereList(true)}
+                  onFocus={() => setShowEcoleList(true)}
                 />
               </View>
-              {showFiliereList && (
+              {showEcoleList && ecole.length > 0 && (
                 <View style={styles.suggestionBox}>
-                  {filteredFilieres.length > 0 ? (
-                    filteredFilieres.map((item) => (
-                      <TouchableOpacity
-                        key={item.label}
-                        style={styles.suggestionItem}
-                        onPress={() => {
-                          setFiliere(item.label);
-                          setShowFiliereList(false);
-                        }}
-                      >
-                        <Text style={styles.suggestionText}>{item.label}</Text>
-                      </TouchableOpacity>
-                    ))
-                  ) : (
-                    <Text style={styles.noResult}>
-                      Aucune filière pour ce niveau
-                    </Text>
-                  )}
+                  {filteredEcoles.map((item) => (
+                    <TouchableOpacity
+                      key={item}
+                      style={styles.suggestionItem}
+                      onPress={() => {
+                        setEcole(item);
+                        setShowEcoleList(false);
+                      }}
+                    >
+                      <Text style={styles.suggestionText}>{item}</Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
               )}
             </View>
-          )}
-        </View>
-      </ScrollView>
 
-      <AppButton label="TERMINER" onPress={handleComplete} />
-    </SafeAreaView>
+            <Text style={styles.labelSection}>Niveau d&apos;étude</Text>
+            <View style={styles.levelContainer}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <TouchableOpacity
+                  key={n}
+                  style={[
+                    styles.levelCircle,
+                    niveau === n && styles.levelCircleActive,
+                  ]}
+                  onPress={() => {
+                    setNiveau(n);
+                    setFiliere("");
+                  }}
+                >
+                  <Text style={styles.levelText}>{n}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {niveau && (
+              <View style={{ zIndex: 1000, marginTop: 10 }}>
+                <View style={styles.inputWrapper}>
+                  <View style={styles.iconCircle}>
+                    <BookOpen color="#fff" size={22} />
+                  </View>
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder="Rechercher ma filière..."
+                    placeholderTextColor="#ffffff88"
+                    value={filiere}
+                    returnKeyType="done"
+                    onSubmitEditing={handleComplete}
+                    onChangeText={(t) => {
+                      setFiliere(t);
+                      setShowFiliereList(true);
+                    }}
+                    onFocus={() => setShowFiliereList(true)}
+                  />
+                </View>
+                {showFiliereList && (
+                  <View style={styles.suggestionBox}>
+                    {filteredFilieres.length > 0 ? (
+                      filteredFilieres.map((item) => (
+                        <TouchableOpacity
+                          key={item.label}
+                          style={styles.suggestionItem}
+                          onPress={() => {
+                            setFiliere(item.label);
+                            setShowFiliereList(false);
+                          }}
+                        >
+                          <Text style={styles.suggestionText}>
+                            {item.label}
+                          </Text>
+                        </TouchableOpacity>
+                      ))
+                    ) : (
+                      <Text style={styles.noResult}>
+                        Aucune filière pour ce niveau
+                      </Text>
+                    )}
+                  </View>
+                )}
+              </View>
+            )}
+          </View>
+        </ScrollView>
+
+        <AppButton label="TERMINER" onPress={handleComplete} />
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -224,7 +241,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: "#ffffffaa",
     textAlign: "center",
     marginBottom: 20,
   },
