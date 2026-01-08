@@ -1,10 +1,11 @@
 import { AppButton } from "@/components";
 import { colors } from "@/components/ui/themes/colors";
-import { register } from "@/services/auth.service";
+import { registerUser } from "@/services/auth.service";
+import { useAuthStore } from "@/store/store";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Eye } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Image,
   Pressable,
@@ -18,15 +19,27 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function Inscription() {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const setToken = useAuthStore((state) => state.setToken);
+  const passwordRef = useRef<TextInput>(null);
 
   const handleSubmit = async () => {
+    setError(null);
+
     try {
-      register({ email, password });
-      console.log(email);
+      const result = await registerUser({ email, password });
+
+      if (result.error) {
+        setError(result.error);
+      } else if (result.data?.token) {
+        await setToken(result.data.token);
+        router.replace("/Personalisation");
+      }
     } catch (e) {
-      console.log(e);
+      setError("Une erreur inattendue est survenue");
+      console.error(e);
     }
   };
 
@@ -43,7 +56,11 @@ export default function Inscription() {
       </View>
       <View style={styles.section}>
         <View style={styles.headSection}>
-          <Text style={styles.labelText}>Inscription</Text>
+          {!error ? (
+            <Text style={styles.labelText}>Inscription</Text>
+          ) : (
+            <Text style={styles.errorStyle}>{error}</Text>
+          )}
           <TouchableOpacity style={styles.googleSection}>
             <Image
               style={styles.googleLogo}
@@ -71,6 +88,9 @@ export default function Inscription() {
             placeholder="email"
             keyboardType="email-address"
             placeholderTextColor="#fff"
+            returnKeyType="next"
+            onSubmitEditing={() => passwordRef.current?.focus()}
+            autoCapitalize="none"
           />
         </View>
 
@@ -79,6 +99,7 @@ export default function Inscription() {
             <Eye color="#fff" />
           </View>
           <TextInput
+            ref={passwordRef}
             style={styles.input}
             value={password}
             onChangeText={setPassword}
@@ -86,6 +107,9 @@ export default function Inscription() {
             keyboardType="default"
             secureTextEntry
             placeholderTextColor="#fff"
+            returnKeyType="done"
+            onSubmitEditing={handleSubmit}
+            blurOnSubmit={true}
           />
         </View>
 
@@ -96,9 +120,7 @@ export default function Inscription() {
         <Text style={styles.descriptionText}>Vous avez déjà un compte ?</Text>
         <Pressable
           onPress={() => {
-            console.log("CLICK");
-            router.replace("/connected");
-            // router.replace("/connexion");
+            router.replace("/connexion");
           }}
         >
           <Text style={styles.connexion}>Connexion</Text>
@@ -204,5 +226,10 @@ const styles = StyleSheet.create({
   connexion: {
     fontWeight: 500,
     color: colors.primary,
+  },
+  errorStyle: {
+    color: "#ff0000",
+    fontSize: 12,
+    fontWeight: "200",
   },
 });

@@ -1,6 +1,7 @@
 import { AppButton } from "@/components";
 import { colors } from "@/components/ui/themes/colors";
-import { login } from "@/services/auth.service";
+import { loginUser } from "@/services/auth.service";
+import { useAuthStore } from "@/store/store";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { ArrowLeft, Eye } from "lucide-react-native";
@@ -20,12 +21,25 @@ export default function Connexion() {
   const router = useRouter();
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
+  const setToken = useAuthStore((state) => state.setToken);
 
   const handleSubmit = async () => {
+    setError(null);
+
     try {
-      login({ email, password });
+      const result = await loginUser({ email, password });
+
+      if (result.error) {
+        setError(result.error);
+      } else if (result.data?.token) {
+        await setToken(result.data.token);
+        console.log("Token stocké et store mis à jour !");
+        router.replace("/connected");
+      }
     } catch (e) {
-      console.log(e);
+      setError("Une erreur inattendue est survenue");
+      console.error(e);
     }
   };
 
@@ -42,7 +56,11 @@ export default function Connexion() {
       </View>
       <View style={styles.section}>
         <View style={styles.headSection}>
-          <Text style={styles.labelText}>Connexion</Text>
+          {!error ? (
+            <Text style={styles.labelText}>Connexion</Text>
+          ) : (
+            <Text style={styles.errorStyle}>{error}</Text>
+          )}
           <TouchableOpacity style={styles.googleSection}>
             <Image
               style={styles.googleLogo}
@@ -103,7 +121,7 @@ export default function Connexion() {
         <Text style={styles.descriptionText}>Vous avez déjà un compte ?</Text>
         <Pressable
           onPress={() => {
-            router.replace("/connected");
+            router.replace("/inscription");
           }}
         >
           <Text style={styles.connexion}>Inscription</Text>
@@ -220,4 +238,11 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
   },
+  errorStyle: {
+    color: "#ff0000",
+    fontSize: 12,
+    fontWeight: "200",
+  },
 });
+
+
