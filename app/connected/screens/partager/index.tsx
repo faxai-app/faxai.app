@@ -1,12 +1,12 @@
 import { colors } from "@/components/ui/themes/colors";
-import { shareResource } from "@/services/user.service";
-import { useUserStore } from "@/store/store";
+import { useAuthStore } from "@/store/store";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import * as DocumentPicker from "expo-document-picker";
 import * as ImagePicker from "expo-image-picker";
 import {
   BookOpen,
   Calendar,
+  CheckCircle2,
   FileDown,
   FileText,
   Image as ImageIcon,
@@ -14,9 +14,10 @@ import {
   UserRound,
   X,
 } from "lucide-react-native";
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Alert,
+  Animated,
   ScrollView,
   StyleSheet,
   Text,
@@ -29,18 +30,64 @@ import { SafeAreaView } from "react-native-safe-area-context";
 type ContentType = "post" | "epreuve" | "cours";
 
 export default function Partager() {
-  const { user } = useUserStore();
   const [activeTab, setActiveTab] = useState<ContentType>("post");
   const [content, setContent] = useState("");
-  const [attachments, setAttachments] = useState<any[]>([]); // Images et PDF
+  const [attachments, setAttachments] = useState<any[]>([]);
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // Animation pour le succès
+  const [showSuccess, setShowSuccess] = useState(false);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   const [details, setDetails] = useState({
     title: "",
-    type: "SN1", // SN1, SN2, R1, R2
+    type: "SN1",
     professor: "",
     date: new Date(),
   });
+
+  // Animation de succès
+  useEffect(() => {
+    if (showSuccess) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.spring(scaleAnim, {
+          toValue: 1,
+          friction: 5,
+          useNativeDriver: true,
+        }),
+      ]).start();
+
+      // Disparition après 2 secondes
+      const timer = setTimeout(() => {
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }).start(() => setShowSuccess(false));
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccess]);
+
+  const resetForm = () => {
+    setContent("");
+    setAttachments([]);
+    setDetails({
+      title: "",
+      type: "SN1",
+      professor: "",
+      date: new Date(),
+    });
+    setActiveTab("post");
+  };
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -84,38 +131,96 @@ export default function Partager() {
   };
 
   const handleShare = async () => {
-    const res = await shareResource({
-      content,
-      type: activeTab,
-      attachments,
-      details:
-        activeTab !== "post"
-          ? {
-              title: details.title,
-              type: details.type,
-              professor: details.professor,
-              year: details.date.getFullYear().toString(),
-            }
-          : undefined,
-    });
-    if (res.error) Alert.alert("Erreur", res.error);
-    else Alert.alert("Succès", "Publication partagée !");
+    if (isLoading) return;
+
+    try {
+      setIsLoading(true);
+      const formData = new FormData();
+      formData.append("content", content);
+      formData.append("type", activeTab);
+
+      attachments.forEach((file: any) => {
+        formData.append("files", {
+          uri: file.uri,
+          name: file.name,
+          type: file.type,
+        } as any);
+      });
+
+      if (activeTab !== "post") {
+        formData.append("title", details.title);
+        formData.append("detailsType", details.type);
+        formData.append("professor", details.professor);
+        formData.append("year", details.date.getFullYear().toString());
+      }
+
+      const token = useAuthStore.getState().token;
+      // Correction: suppression de l'espace dans l'URL
+      const response = await fetch("http://192.168.8.100:5000/files", {
+        method: "POST",
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(errorText);
+      }
+
+      // Succès : afficher l'animation et reset
+      setShowSuccess(true);
+      resetForm();
+    } catch (error: any) {
+      console.error("Erreur:", error);
+      Alert.alert("Erreur", error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Header Statique */}
+      {/* Overlay de succès */}
+      {showSuccess && (
+        <Animated.View
+          style={[
+            styles.successOverlay,
+            {
+              opacity: fadeAnim,
+              transform: [{ scale: scaleAnim }],
+            },
+          ]}
+        >
+          <CheckCircle2 color={colors.primary} size={60} />
+          <Text style={styles.successText}>Publié avec succès !</Text>
+        </Animated.View>
+      )}
+
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity>
           <X color="#fff" size={28} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={handleShare} style={styles.shareBtn}>
-          <Text style={styles.shareText}>Partager</Text>
+
+        <TouchableOpacity
+          onPress={handleShare}
+          style={[
+            styles.shareBtn,
+            isLoading && styles.shareBtnDisabled,
+            showSuccess && styles.shareBtnSuccess,
+          ]}
+          disabled={isLoading}
+        >
+          <Text style={styles.shareText}>
+            {isLoading ? "Envoi..." : showSuccess ? "Publié !" : "Partager"}
+          </Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView style={styles.scroll}>
-        {/* Sélecteur de Type (Tabs) */}
+        {/* Tabs */}
         <View style={styles.tabContainer}>
           {(["post", "epreuve", "cours"] as ContentType[]).map((tab) => (
             <TouchableOpacity
@@ -135,7 +240,7 @@ export default function Partager() {
           ))}
         </View>
 
-        {/* Input Texte Principal */}
+        {/* Input Principal */}
         <View style={styles.mainInputBox}>
           <TextInput
             style={styles.mainInput}
@@ -145,7 +250,7 @@ export default function Partager() {
             value={content}
             onChangeText={setContent}
           />
-          {/* Boutons d'ajouts juste sous le texte */}
+
           <View style={styles.attachBar}>
             <TouchableOpacity onPress={pickImage} style={styles.attachBtn}>
               <ImageIcon color={colors.primary} size={20} />
@@ -169,6 +274,7 @@ export default function Partager() {
                 placeholder="Nom de la matière"
                 placeholderTextColor="#666"
                 style={styles.input}
+                value={details.title}
                 onChangeText={(v) => setDetails({ ...details, title: v })}
               />
             </View>
@@ -179,12 +285,12 @@ export default function Partager() {
                 placeholder="Nom de l'enseignant"
                 placeholderTextColor="#666"
                 style={styles.input}
+                value={details.professor}
                 onChangeText={(v) => setDetails({ ...details, professor: v })}
               />
             </View>
 
             <View style={styles.grid}>
-              {/* Sélecteur de Type (SN1, SN2, etc) UNIQUEMENT pour épreuve */}
               {activeTab === "epreuve" && (
                 <View style={[styles.inputRow, { flex: 1, marginRight: 10 }]}>
                   <Layers color={colors.primary} size={20} />
@@ -228,7 +334,7 @@ export default function Partager() {
           </View>
         )}
 
-        {/* Prévisualisation des fichiers */}
+        {/* Prévisualisation */}
         <View style={styles.previewContainer}>
           {attachments.map((file, i) => (
             <View key={i} style={styles.fileCard}>
@@ -253,6 +359,23 @@ export default function Partager() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#000" },
+  successOverlay: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.9)",
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 1000,
+  },
+  successText: {
+    color: colors.primary,
+    fontSize: 20,
+    fontWeight: "bold",
+    marginTop: 20,
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -264,6 +387,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 8,
     borderRadius: 20,
+  },
+  shareBtnDisabled: {
+    backgroundColor: "#444",
+    opacity: 0.7,
+  },
+  shareBtnSuccess: {
+    backgroundColor: "#22c55e", // Vert succès
   },
   shareText: { color: "#fff", fontWeight: "bold" },
   scroll: { flex: 1 },
