@@ -13,8 +13,6 @@ export default function Onboarding() {
     <LinearGradient
       style={styles.container}
       colors={[colors.primary, colors.background]}
-      start={{ x: 0, y: 0 }}
-      end={{ x: 0, y: 1 }}
     >
       <StatusBar style="light" translucent />
 
@@ -22,10 +20,10 @@ export default function Onboarding() {
         style={styles.ovaleOrange}
         source={require("@/assets/images/ovale-orange.png")}
       />
-      <Image
+      {/* <Image
         style={styles.radialGradient}
         source={require("@/assets/images/ellipse.png")}
-      />
+      /> */}
 
       <View style={styles.section}>
         <View style={styles.logoView}>
@@ -84,13 +82,13 @@ const styles = StyleSheet.create({
     height: "50%",
     width: "100%",
   },
-  radialGradient: {
-    position: "absolute",
-    zIndex: 5,
-    top: 10,
-    width: "100%",
-    height: 600,
-  },
+  // radialGradient: {
+  //   position: "absolute",
+  //   zIndex: 5,
+  //   top: 10,
+  //   width: "100%",
+  //   height: "20%",
+  // },
   ovaleOrange: {
     position: "absolute",
     zIndex: 4,
@@ -113,6 +111,8 @@ const styles = StyleSheet.create({
     color: colors.primary,
   },
   PageTitle: {
+    textAlign: "left",
+    width: "100%",
     fontSize: 24,
     fontWeight: "700",
     color: "#fff",
