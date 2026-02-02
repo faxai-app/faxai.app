@@ -29,6 +29,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 type ContentType = "post" | "epreuve" | "cours";
 
+// Mapping pour convertir le texte UI en ID int pour le serveur
+const LEVEL_MAP: Record<string, number> = {
+  SN1: 1,
+  SN2: 2,
+  R1: 3,
+  R2: 4,
+};
+
 export default function Partager() {
   const [activeTab, setActiveTab] = useState<ContentType>("post");
   const [content, setContent] = useState("");
@@ -149,7 +157,8 @@ export default function Partager() {
 
       if (activeTab !== "post") {
         formData.append("title", details.title);
-        formData.append("detailsType", details.type);
+        // CONVERSION ICI : on envoie l'entier au lieu du texte
+        formData.append("level", LEVEL_MAP[details.type].toString());
         formData.append("professor", details.professor);
         formData.append("year", details.date.getFullYear().toString());
       }
@@ -182,7 +191,6 @@ export default function Partager() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Overlay de succès */}
       {showSuccess && (
         <Animated.View
           style={[
