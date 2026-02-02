@@ -35,7 +35,7 @@ export default function Profile() {
 
     if (status !== "granted") {
       alert(
-        "Désolé, nous avons besoin des permissions pour accéder à votre galerie !"
+        "Désolé, nous avons besoin des permissions pour accéder à votre galerie !",
       );
       return;
     }
@@ -69,7 +69,7 @@ export default function Profile() {
     };
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
-      backAction
+      backAction,
     );
     return () => backHandler.remove();
   }, [router]);
@@ -129,8 +129,15 @@ export default function Profile() {
           />
         </View>
 
-        <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={() => {
+            logout();
+            router.replace("/(auth)/connexion");
+          }}
+        >
           <LogOut color="#ff4444" size={20} />
+
           <Text style={styles.logoutText}>Déconnexion</Text>
         </TouchableOpacity>
       </ScrollView>
