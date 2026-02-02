@@ -26,17 +26,28 @@ export interface SearchResult {
 export const searchApi = {
   globalSearch: async (query: string): Promise<SearchResult> => {
     const token = useAuthStore.getState().token;
-    const response = await fetch(
-      `${API_URL}/api/search?q=${encodeURIComponent(query)}`,
-      {
+    const url = `${API_URL}/search?q=${encodeURIComponent(query)}`;
+
+    try {
+      const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
         },
-      },
-    );
+      });
 
-    if (!response.ok) throw new Error("Erreur de recherche");
-    return response.json();
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Réponse serveur:", errorText); // ← Ceci montrera la vraie erreur
+        throw new Error(
+          `HTTP ${response.status}: ${errorText.substring(0, 100)}`,
+        );
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error: any) {
+      throw error;
+    }
   },
 };
