@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     borderRadius: 100,
   },
   logo: {
-    position: "fixed",
+    position: "absolute",
     top: "20%",
     alignSelf: "center",
     width: 200,

@@ -7,33 +7,23 @@ export const homeApi = {
   getFeed: async (page: number = 1, limit: number = 10): Promise<Post[]> => {
     try {
       const token = useAuthStore.getState().token;
-      console.log("Token:", token); // DEBUG
-
       if (!token) {
         throw new Error("Token non disponible");
       }
 
       const url = `${API_URL}/home?page=${page}&limit=${limit}`;
-      console.log("Fetching:", url); // DEBUG
-
       const response = await fetch(url, {
         headers: {
           Authorization: `Bearer ${token}`,
           Accept: "application/json",
         },
       });
-
-      console.log("Status:", response.status); // DEBUG
-
       if (!response.ok) {
         const errorText = await response.text();
         console.error("Server error:", errorText); // DEBUG
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
-
       const data = await response.json();
-      console.log("Data received:", data); // DEBUG
-
       if (!data.publications) {
         throw new Error("Format de réponse invalide (manque publications)");
       }
@@ -92,5 +82,16 @@ export const homeApi = {
 
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     return response.json();
+  },
+
+  getBookmarks: async (): Promise<Post[]> => {
+    const token = useAuthStore.getState().token;
+    const response = await fetch(`${API_URL}/bookmarks`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) throw new Error("Erreur chargement bookmarks");
+    const data = await response.json();
+    return data.bookmarks;
   },
 };

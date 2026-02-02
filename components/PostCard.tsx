@@ -11,7 +11,7 @@ import {
   Share2,
   X,
 } from "lucide-react-native";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -38,9 +38,6 @@ interface PostCardProps {
 }
 
 export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
-  const [isLiked, setIsLiked] = useState(post.isLiked || false);
-  const [likesCount, setLikesCount] = useState(post.likesCount || 0);
-  const [isBookmarked, setIsBookmarked] = useState(post.isBookmarked || false);
   const [showComments, setShowComments] = useState(false);
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -54,40 +51,33 @@ export const PostCard: React.FC<PostCardProps> = ({ post, onUpdate }) => {
 
   const { user } = useUserStore();
 
-  useEffect(() => {
-    console.log("Images reçues:", post.images);
-    post.images.forEach((img, i) => {
-      console.log(`Image ${i}:`, img.url);
-    });
-  }, [post]);
+  const isLiked = post.isLiked || false;
+  const isBookmarked = post.isBookmarked || false;
+  const likesCount = post.likesCount || 0;
 
   const handleLike = async () => {
-    const previousState = isLiked;
-    const previousCount = likesCount;
-
-    setIsLiked(!isLiked);
-    setLikesCount(isLiked ? likesCount - 1 : likesCount + 1);
-
     try {
       const result = await homeApi.likePost(post.id);
-      setIsLiked(result.liked);
-      setLikesCount(result.count);
-      onUpdate?.({ ...post, isLiked: result.liked, likesCount: result.count });
+      // Mettre à jour le post parent immédiatement
+      onUpdate?.({
+        ...post,
+        isLiked: result.liked,
+        likesCount: result.count,
+      });
     } catch (error) {
-      setIsLiked(previousState);
-      setLikesCount(previousCount);
+      console.error("Erreur like:", error);
     }
   };
 
   const handleBookmark = async () => {
-    const previousState = isBookmarked;
-    setIsBookmarked(!isBookmarked);
-
     try {
       const result = await homeApi.bookmarkPost(post.id);
-      setIsBookmarked(result.bookmarked);
+      onUpdate?.({
+        ...post,
+        isBookmarked: result.bookmarked,
+      });
     } catch (error) {
-      setIsBookmarked(previousState);
+      console.error("Erreur bookmark:", error);
     }
   };
 
